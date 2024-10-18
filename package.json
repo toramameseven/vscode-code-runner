@@ -1,13 +1,13 @@
 {
-  "name": "code-runner",
-  "displayName": "Code Runner",
+  "name": "code-runner-j",
+  "displayName": "Code Runner-j",
   "description": "Run C, C++, Java, JS, PHP, Python, Perl, Ruby, Go, Lua, Groovy, PowerShell, CMD, BASH, F#, C#, VBScript, TypeScript, CoffeeScript, Scala, Swift, Julia, Crystal, OCaml, R, AppleScript, Elixir, VB.NET, Clojure, Haxe, Obj-C, Rust, Racket, Scheme, AutoHotkey, AutoIt, Kotlin, Dart, Pascal, Haskell, Nim, D, Lisp, Kit, V, SCSS, Sass, CUDA, Less, Fortran, Ring, Standard ML, Zig, Mojo, Erlang, SPWN, Pkl, Gleam",
   "version": "0.12.2",
   "featureFlags": {
     "usingNewPythonInterpreterPathApi": true,
     "usingNewPythonInterpreterPathApiV2": true
   },
-  "publisher": "formulahendry",
+  "publisher": "mame",
   "icon": "images/logo.png",
   "engines": {
     "vscode": "^1.56.0"
@@ -42,7 +42,7 @@
     "onCommand:code-runner.runByLanguage",
     "onStartupFinished"
   ],
-  "main": "./out/src/extension",
+  "main": "./dist/extension",
   "contributes": {
     "commands": [
       {
@@ -379,20 +379,30 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
+    "vscode:prepublish-org": "tsc -p ./",
     "compile": "tsc -watch -p ./",
-    "tslint": "tslint -t verbose src/**/*.ts"
+    "tslint": "tslint -t verbose src/**/*.ts",
+    "compile-es": "npm run check-types && node esbuild.js",
+    "check-types": "tsc --noEmit",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "vscode:prepublish": "npm run package",
+    "package": "npm run check-types && node esbuild.js --production"
   },
   "dependencies": {
     "applicationinsights": "^0.19.0",
+    "encoding-japanese": "^2.2.0",
     "micromatch": "^4.0.2",
     "tree-kill": "^1.2.2"
   },
   "devDependencies": {
+    "@types/encoding-japanese": "^2.2.1",
     "@types/micromatch": "^3.1.0",
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
     "@types/vscode": "^1.56.0",
+    "esbuild": "^0.24.0",
     "mocha": "^6.1.4",
     "tslint": "^5.5.0",
     "typescript": "^3.8.3"

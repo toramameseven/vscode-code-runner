@@ -7,6 +7,7 @@ import * as vscode from "vscode";
 import { AppInsightsClient } from "./appInsightsClient";
 import { Constants } from "./constants";
 import { Utility } from "./utility";
+import Encoding = require("encoding-japanese");
 
 const TmpDir = os.tmpdir();
 
@@ -475,11 +476,13 @@ export class CodeManager implements vscode.Disposable {
         this._process = spawn(command, [], { cwd: this._cwd, shell: true });
 
         this._process.stdout.on("data", (data) => {
-            this._outputChannel.append(data.toString());
+            const s = this.toShiftJis(data);
+            this._outputChannel.append(s.toString());
         });
 
         this._process.stderr.on("data", (data) => {
-            this._outputChannel.append(data.toString());
+            const s = this.toShiftJis(data);
+            this._outputChannel.append(s.toString());
         });
 
         this._process.on("close", (code) => {
@@ -505,5 +508,19 @@ export class CodeManager implements vscode.Disposable {
             isTmpFile: this._isTmpFile.toString(),
         };
         this._appInsightsClient.sendEvent(executor, properties);
+    }
+
+    private toShiftJis(s: Buffer){
+        const detectEnc = Encoding.detect(s);
+        if (detectEnc ==='SJIS')
+        {
+            const unicodeArray = Encoding.convert(s, {
+                to: 'UNICODE',
+                from: 'SJIS'
+              });
+            const str = Encoding.codeToString(unicodeArray);
+            return str;
+        }
+        return s.toString();
     }
 }
